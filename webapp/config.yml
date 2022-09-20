@@ -1,2 +1,5 @@
 some_service:
   name: "s"
+
+db:
+  url: "postgresql+asyncpg://USERNAME:PASSWORD@SERVER:PORT/DB_NAME"

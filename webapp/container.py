@@ -1,5 +1,6 @@
 from dependency_injector import containers, providers
 from core.some_service import SomeService
+from core.database_service import DatabaseService
 
 class Container(containers.DeclarativeContainer):
 
@@ -15,3 +16,5 @@ class Container(containers.DeclarativeContainer):
 
     some_service = providers.Singleton(
         some_service_factory, config.some_service.name)
+
+    db_service = providers.Singleton(DatabaseService, db_url=config.db.url)

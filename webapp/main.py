@@ -16,6 +16,9 @@ config.fileConfig('logging.conf', disable_existing_loggers=False)
 def create_app() -> FastAPI:
     container = Container()
 
+    db = container.db_service()
+    db.create_database()
+
     app = FastAPI()
 
     app.add_middleware(
