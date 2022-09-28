@@ -1,11 +1,10 @@
 """Database module."""
 
-from contextlib import AbstractContextManager, asynccontextmanager
-from typing import Callable
+from contextlib import asynccontextmanager
 import logging
 
 from sqlalchemy import orm
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
@@ -16,24 +15,16 @@ Base = declarative_base()
 
 class DatabaseService:
 
-    def __init__(self, db_url: str) -> None:
-        self.db_url = db_url
-        logger.info(db_url)
-        self._engine = create_async_engine(db_url, echo=False)
-        self._session_factory = orm.sessionmaker(
-            autocommit=False,
-            autoflush=False,
-            bind=self._engine,
-            expire_on_commit=False,
-            class_=AsyncSession
-        )
+    def __init__(self, engine: AsyncEngine, session_factory: orm.sessionmaker) -> None:
+        self._engine = engine
+        self._session_factory = session_factory
 
     async def create_database(self) -> None:
         async with self._engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
     @asynccontextmanager
-    async def session(self) -> Callable[..., AbstractContextManager[Session]]:
+    async def session(self):
         session: Session = self._session_factory()
         try:
             yield session
